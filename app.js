@@ -16,3 +16,7 @@ addEventListener('touchmove',e=>{const touch=e.touches[0];if(touch)move(touch.cl
 const themeButton=document.getElementById('theme-toggle');
 function applyTheme(theme){document.documentElement.dataset.theme=theme;const light=theme==='light';themeButton.innerHTML=light?'☾ <span>Dark</span>':'☀ <span>Light</span>';themeButton.setAttribute('aria-label',`Switch to ${light?'dark':'light'} mode`);themeButton.setAttribute('aria-pressed',String(light));document.querySelector('meta[name="theme-color"]').setAttribute('content',light?'#f6f7fc':'#08090e');if(paused)draw(0)}
 applyTheme(document.documentElement.dataset.theme||'dark');themeButton.addEventListener('click',()=>{const next=document.documentElement.dataset.theme==='light'?'dark':'light';applyTheme(next);try{localStorage.setItem('akash-theme',next)}catch(e){}});
+
+// Avoid accidental text selection while touching the particle background.
+document.addEventListener('selectstart',event=>event.preventDefault());
+document.addEventListener('contextmenu',event=>event.preventDefault());
