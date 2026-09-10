@@ -20,3 +20,17 @@ applyTheme(document.documentElement.dataset.theme||'dark');themeButton.addEventL
 // Avoid accidental text selection while touching the particle background.
 document.addEventListener('selectstart',event=>event.preventDefault());
 document.addEventListener('contextmenu',event=>event.preventDefault());
+
+// Clear native selection, including selections restored by the mobile browser.
+function clearPageSelection(){const selection=window.getSelection();if(selection&&selection.rangeCount)selection.removeAllRanges()}
+document.addEventListener('selectionchange',clearPageSelection);
+document.addEventListener('contextmenu',event=>{event.preventDefault();event.stopImmediatePropagation();clearPageSelection()},true);
+document.addEventListener('selectstart',event=>{event.preventDefault();clearPageSelection()},true);
+// Clear lingering selection during a hold while preserving native scrolling.
+let holdTimer=null;
+function cancelHold(){clearTimeout(holdTimer);holdTimer=null}
+document.addEventListener('touchstart',event=>{cancelHold();clearPageSelection();if(event.touches.length!==1)return;const target=event.target;if(target instanceof Element&&target.closest('a,button,summary,input,textarea,select'))return;holdTimer=setTimeout(()=>{clearPageSelection()},350)},{passive:true});
+document.addEventListener('touchmove',cancelHold,{passive:true});
+document.addEventListener('touchend',()=>{cancelHold();clearPageSelection()},{passive:true});
+document.addEventListener('touchcancel',cancelHold,{passive:true});
+window.addEventListener('pageshow',clearPageSelection);
